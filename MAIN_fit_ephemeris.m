@@ -372,7 +372,8 @@ figure;
 colorbar
 xlim([1,13])
 ylim([1,13])
-caxis([0.9, 1.8])
+% caxis([0.9, 1.8])
+caxis([1.0, 3.0])
 h = colorbar;
 ylabel(h, '95% RMS URE [cm]')
 set(hc, 'EdgeColor','none')
@@ -430,7 +431,8 @@ figure;
 colorbar
 xlim([1,13])
 ylim([1,13])
-caxis([1, 6.0])
+% caxis([1, 6.0])
+caxis([1, 10.0])
 h = colorbar;
 ylabel(h, 'Max 3D RMS Error [cm]')
 set(hc, 'EdgeColor','none')

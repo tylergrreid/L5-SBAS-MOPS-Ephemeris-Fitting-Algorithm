@@ -46,14 +46,14 @@ function [ab,eb,incb,RAANb,omegab,M0b,Cusb,Cucb,IDOTb,numbits] = bit_reduction(a
 % Parameter bit assignment.
 % Based on the IWG draft MOPS ICD 16/12/2014 
 % This was different for ION GNSS 2013.
-a_bits        = 32;
-e_bits        = 31;
-i_bits        = 34; 
-RAAN_bits     = 35; % allows 1 sign bit
-omega_bits    = 35; % allows 1 sign bit
-M0_bits       = 35; % allows 1 sign bit
-Cuc_bits      = 22; % allows 1 sign bit
-Cus_bits      = 22; % allows 1 sign bit
+a_bits        = 31;
+e_bits        = 30;
+i_bits        = 33; 
+RAAN_bits     = 34; % allows 1 sign bit
+omega_bits    = 34; % allows 1 sign bit
+M0_bits       = 34; % allows 1 sign bit
+Cuc_bits      = 19; % allows 1 sign bit
+Cus_bits      = 19; % allows 1 sign bit
 IDOT_bits     = 22; % allows 1 sign bit
 
 % Compute the number of message bits. 
@@ -62,15 +62,15 @@ numbits = a_bits+e_bits+i_bits+RAAN_bits+omega_bits+M0_bits+IDOT_bits+Cuc_bits+C
 % Define scale factors (SF).
 % SF's are as per the IWG draft MOPS ICD 16/12/2014 
 % This was different for ION GNSS 2013. 
-scale_a     = 0.01; % 4.2180e7*2^-32;% 42164169.63417010.01; % 35 bits (0 sign)
-scale_e     = 2^-31; % 33 bits (0 sign)
-scale_i     = pi*2^-34; % 34 bits (0 sign)
-scale_RAAN  = pi*2^-34; % 35 bits (1 sign)
-scale_omega = pi*2^-34; % 35 bits (1 sign)
-scale_M0    = pi*2^-34; % 35 bits (1 sign)
-scale_Cuc   = ((pi/2)*1e-4)*(2^-21); % 20 bits (1 sign)
-scale_Cus   = ((pi/2)*1e-4)*(2^-21); % 20 bits (1 sign)
-scale_IDOT  = ((7*pi/6)*1e-6)*(2^-21); % 20 bits (1 sign)
+scale_a     = 0.02; % 31 bits (0 sign)
+scale_e     = 2^-30; % 30 bits (0 sign), only allows for 0<=e<=0.5
+scale_i     = pi*2^-33; % 34 bits (0 sign)
+scale_RAAN  = pi*2^-33; % 35 bits (1 sign)
+scale_omega = pi*2^-33; % 35 bits (1 sign)
+scale_M0    = pi*2^-33; % 35 bits (1 sign)
+scale_Cuc   = ((pi/2)*1e-4)*(2^-18); % 21 bits (1 sign)
+scale_Cus   = ((pi/2)*1e-4)*(2^-18); % 21 bits (1 sign)
+scale_IDOT  = ((7*pi/6)*1e-6)*(2^-21); % 21 bits (1 sign)
 
 % -------------------------------------------------------------------------
 % Semi major axis
