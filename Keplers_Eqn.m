@@ -1,4 +1,4 @@
-function E_a = Keplers_Eqn(M,e)
+function E_a = Keplers_Eqn(M, e)
 %% DESCRIPTION:
 %
 %   AA 279 - SPACE MECHANICS 
@@ -18,7 +18,7 @@ function E_a = Keplers_Eqn(M,e)
 % -------------------------------------------------------------------------
 % INPUT:
 %   
-%       e = eccentrity                               [rad]    
+%       e = eccentrity                               [-]    
 %       M = mean anomaly                             [rad]
 %
 % ------------------------------------------------------------------------- 

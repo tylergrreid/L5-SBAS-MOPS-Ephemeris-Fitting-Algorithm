@@ -1,0 +1,59 @@
+Create Spacecraft mtsat2;
+GMAT mtsat2.DateFormat = UTCGregorian;
+GMAT mtsat2.Epoch = '03 Feb 2018 23:30:00.000';
+GMAT mtsat2.CoordinateSystem = EarthMJ2000Eq;
+GMAT mtsat2.SMA = 42164.1387;
+GMAT mtsat2.ECC = 0.00042061;
+GMAT mtsat2.RAAN = 0.39156;
+GMAT mtsat2.AOP = 327.1229;
+GMAT mtsat2.TA = 304.0656;
+GMAT mtsat2.INC = 0.00195;
+GMAT mtsat2.DryMass = 1665;
+GMAT mtsat2.SRPArea = 21;
+GMAT mtsat2.DragArea = 21;
+GMAT mtsat2.Cr = 1.8;
+GMAT mtsat2.Cd = 2.2;
+Create ForceModel fm;
+GMAT fm.CentralBody = Earth;
+GMAT fm.PrimaryBodies = {Earth};
+GMAT fm.GravityField.Earth.Degree = 70;
+GMAT fm.GravityField.Earth.Order  = 70;
+GMAT fm.GravityField.Earth.PotentialFile = 'EGM96.cof';
+GMAT fm.GravityField.Earth.EarthTideModel = 'SolidAndPole';
+
+GMAT fm.PointMasses = {Luna, Sun};
+
+GMAT fm.Drag.AtmosphereModel = MSISE90;
+GMAT fm.Drag.HistoricWeatherSource = 'ConstantFluxAndGeoMag';
+GMAT fm.Drag.PredictedWeatherSource = 'ConstantFluxAndGeoMag';
+GMAT fm.Drag.F107 = 150;
+GMAT fm.Drag.F107A = 150;
+GMAT fm.Drag.MagneticIndex = 3;
+
+GMAT fm.SRP = On;
+GMAT fm.SRP.Flux = 1367;
+GMAT fm.SRP.SRPModel = Spherical;
+GMAT fm.SRP.Nominal_Sun = 149597870.691;
+
+GMAT fm.RelativisticCorrection = On;
+
+GMAT fm.ErrorControl = RSSStep;
+
+Create Propagator prop;
+GMAT prop.FM = fm;
+GMAT prop.Type = RungeKutta89;
+GMAT prop.InitialStepSize = 30;
+GMAT prop.Accuracy = 9.999999999999999e-12;
+GMAT prop.MinStep = 0.001;
+GMAT prop.MaxStep = 30;
+GMAT prop.MaxStepAttempts = 50;
+GMAT prop.StopIfAccuracyIsViolated = true;
+
+Create EphemerisFile EphmerisFile_mtsat2;
+EphmerisFile_mtsat2.Spacecraft = mtsat2;
+EphmerisFile_mtsat2.Filename = 'EphemerisFile_mtsat2.eph';
+EphmerisFile_mtsat2.CoordinateSystem = EarthMJ2000Eq;
+EphmerisFile_mtsat2.StepSize = 10;
+
+BeginMissionSequence;
+Propagate prop(mtsat2) {mtsat2.ElapsedSecs = 604800.0};

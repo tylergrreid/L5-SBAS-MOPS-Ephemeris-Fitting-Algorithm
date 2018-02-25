@@ -47,7 +47,7 @@ orbit_data.pos_m = orbit_data_raw.data(:,1:3) * 1000;
 orbit_data.vel_m_s = orbit_data_raw.data(:,4:6) * 1000;
 
 % Format the date / time vectors.
-orbit_data.datestr = orbit_data_raw.textdata(21:end,1);
+orbit_data.datestr = orbit_data_raw.textdata(18:end,1);
 orbit_data.datenum = datenum(orbit_data.datestr,'yyyy-mm-ddTHH:MM:SS.FFF');
 
 % Make an elapsed time vector.
