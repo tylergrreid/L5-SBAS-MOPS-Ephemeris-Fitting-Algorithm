@@ -51,7 +51,7 @@ MA = 304.10548; % [deg]
 
 % Read in GMAT ephemeris file. 
 file_directory_GMAT = [pwd, '/Results_Fitting_MTSAT2/'];
-file_name_GMAT = 'EphemerisFile_mtsat2_1day.eph';
+file_name_GMAT = 'EphemerisFile_mtsat2_7day.eph';
 
 % Read data in the propagated orbit file.
 exact_time_step = true;
@@ -116,7 +116,17 @@ eph_Save(num_eph_per_file).Omega_dot =[];
 eph_Save(num_eph_per_file).Delta_n   =[];
 eph_Save(num_eph_per_file).Toe   =[];
 
+% Start threshold for progress bar. 
+progress = 0; % [percent]
+
 for idx_message = 1:num_eph_per_file
+    % Percent done. 
+    percent_done = floor(idx_message/num_eph_per_file * 100);
+    if percent_done > progress
+        disp(['Percent done: ', num2str(percent_done), ', Elapsed time is: ', num2str(toc/60), ' [min]']);
+        progress = percent_done;
+    end
+    
     % Define the time vector for fitting.
     time = ...
         orbit_data.elapsed_time_sec(...
@@ -271,13 +281,13 @@ clear('rms_ure_Save', 'rms_3D_Save','max_3D_Save', ...
 % Turn rank deficient warning on.
 warning('on','MATLAB:rankDeficientMatrix');
 
-%% ANALYZE RESULTS
+%% ANALYZE RESULTS FOR 1 DAY
 
 % Close all plot. 
 close all
 
 % Select data file. 
-file_name_save = [file_dir_save, 'Results_MTSAT2.mat'];
+file_name_save = [file_dir_save, 'Results_MTSAT2_1day.mat'];
 
 % Set date limits for plotting. 
 x_lower_plot = datenum('Feb 03, 2018 23:30:00');
@@ -295,7 +305,7 @@ xlim([x_lower_plot, x_upper_plot])
 xlabel({'UTC',datestr(orbit_data.datenum(1), 'mmm-dd-yyyy')})
 ylabel('Max 3D Error in Fit Interval [cm]')
 title('Max 3D Representation Error as a Function of Time')
-fileSave = [file_dir_save ,'error_max_3D_vs_time.tiff'];
+fileSave = [file_dir_save ,'error_max_3D_vs_time_1day.png'];
 exportfig(gcf,fileSave,'height',9,'width',12,'fontsize',22,'resolution',220);
 
 % Plot RMS 3D error as a function of date. 
@@ -307,7 +317,7 @@ xlim([x_lower_plot, x_upper_plot])
 xlabel({'UTC',datestr(orbit_data.datenum(1), 'mmm-dd-yyyy')})
 ylabel('3D RMS Error [cm]')
 title('3D RMS Representation Error as a Function of Time')
-fileSave = [file_dir_save ,'error_rms_3D_vs_time.tiff'];
+fileSave = [file_dir_save ,'error_rms_3D_vs_time_1day.png'];
 exportfig(gcf,fileSave,'height',9,'width',12,'fontsize',22,'resolution',220);
 
 % Plot RMS URE as a function of date. 
@@ -319,11 +329,27 @@ xlim([x_lower_plot, x_upper_plot])
 xlabel({'UTC',datestr(orbit_data.datenum(1), 'mmm-dd-yyyy')})
 ylabel('RMS URE [cm]')
 title('RMS Representation URE as a Function of Time')
-fileSave = [file_dir_save ,'error_rms_ure_vs_time.tiff'];
+fileSave = [file_dir_save ,'error_rms_ure_vs_time_1day.png'];
+exportfig(gcf,fileSave,'height',9,'width',12,'fontsize',22,'resolution',220);
+
+% Plot harmonic correction terms as a function of date. 
+figure; 
+hold all; 
+plot(eph_datenum_Save, abs([eph_Save.Cus]), 'linewidth', 2)
+plot(eph_datenum_Save, abs([eph_Save.Cuc]), 'linewidth', 2)
+grid on
+datetick
+xlim([x_lower_plot, x_upper_plot])
+xlabel({'UTC',datestr(orbit_data.datenum(1), 'mmm-dd-yyyy')})
+ylabel('Harmonic Correction to Arg. Latitude [rad/s]')
+title({'Harmonic Correction to Arg. Latitude as a Function of Time',''})
+legend('|C_{us}|', '|C_{uc}|', 'location', 'best')
+legend boxoff
+fileSave = [file_dir_save ,'cus_cuc_vs_time_1day.png'];
 exportfig(gcf,fileSave,'height',9,'width',12,'fontsize',22,'resolution',220);
 
 % Ouput performance statistics to file. 
-file_summary = [file_dir_save, 'summary.txt'];
+file_summary = [file_dir_save, 'summary_1day.txt'];
 file_id = fopen(file_summary, 'w');
 
 fprintf(file_id, ['Total failures is: ', num2str(sum(failure_flag_Save(:))), '\n']);
@@ -340,7 +366,129 @@ fprintf(file_id, ['Max In-Fit-Interval Error is: ', num2str( prctile(max_3D_Save
 
 fclose(file_id);
 
-%% PLOT RAAN FOR COMPARISON
+%% ANALYZE RESULTS FOR 7 DAYS
+
+% Close all plot. 
+close all
+
+% Select data file. 
+file_name_save = [file_dir_save, 'Results_MTSAT2_7day.mat'];
+
+% Set date limits for plotting. 
+x_lower_plot = 0; %datenum('Feb 03, 2018 23:30:00');
+x_upper_plot = 7; %datenum('Feb 10, 2018 23:30:00');
+
+% Load data. 
+load(file_name_save);
+
+% Plot RMS URE as a function of date. 
+figure; 
+plot(eph_datenum_Save - eph_datenum_Save(1), ...
+    max_3D_Save * 100, 'linewidth', 2)
+grid on
+xlim([x_lower_plot, x_upper_plot])
+xlabel(['Time Since ', orbit_data.datestr(1) ,' [days]'])
+ylabel('Max 3D Error in Fit Interval [cm]')
+title('Max 3D Representation Error as a Function of Time')
+fileSave = [file_dir_save ,'error_max_3D_vs_time_7day.png'];
+exportfig(gcf,fileSave,'height',9,'width',12,'fontsize',22,'resolution',220);
+
+% Plot RMS 3D error as a function of date. 
+figure; 
+plot(eph_datenum_Save - eph_datenum_Save(1), ...
+    rms_3D_Save * 100, 'linewidth', 2)
+grid on
+xlim([x_lower_plot, x_upper_plot])
+xlabel(['Time Since ', orbit_data.datestr(1) ,' [days]'])
+ylabel('3D RMS Error [cm]')
+title('3D RMS Representation Error as a Function of Time')
+fileSave = [file_dir_save ,'error_rms_3D_vs_time_7day.png'];
+exportfig(gcf,fileSave,'height',9,'width',12,'fontsize',22,'resolution',220);
+
+% Plot RMS URE as a function of date. 
+figure; 
+plot(eph_datenum_Save - eph_datenum_Save(1), ...
+    rms_ure_Save * 100, 'linewidth', 2)
+grid on
+xlim([x_lower_plot, x_upper_plot])
+xlabel(['Time Since ', orbit_data.datestr(1) ,' [days]'])
+ylabel('RMS URE [cm]')
+title('RMS Representation URE as a Function of Time')
+fileSave = [file_dir_save ,'error_rms_ure_vs_time_7day.png'];
+exportfig(gcf,fileSave,'height',9,'width',12,'fontsize',22,'resolution',220);
+
+% Plot harmonic correction terms as a function of date. 
+figure; 
+hold all; 
+plot(eph_datenum_Save - eph_datenum_Save(1), ...
+    abs([eph_Save.Cus]), 'linewidth', 2)
+plot(eph_datenum_Save - eph_datenum_Save(1), ...
+    abs([eph_Save.Cuc]), 'linewidth', 2)
+grid on
+xlim([x_lower_plot, x_upper_plot])
+xlabel(['Time Since ', orbit_data.datestr(1) ,' [days]'])
+ylabel('Harmonic Correction to Arg. Latitude [rad/s]')
+title({'Harmonic Correction to Arg. Latitude as a Function of Time',''})
+legend('|C_{us}|', '|C_{uc}|', 'location', 'best')
+legend boxoff
+fileSave = [file_dir_save ,'cus_cuc_vs_time_7day.png'];
+exportfig(gcf,fileSave,'height',9,'width',12,'fontsize',22,'resolution',220);
+
+% Ouput performance statistics to file. 
+file_summary = [file_dir_save, 'summary_7day.txt'];
+file_id = fopen(file_summary, 'w');
+
+fprintf(file_id, ['Total failures is: ', num2str(sum(failure_flag_Save(:))), '\n']);
+fprintf(file_id, '\n');
+fprintf(file_id, ['Median RMS Error is: ', num2str(median(rms_3D_Save(:))), ' [m]\n']);
+fprintf(file_id, ['95th Percentile RMS Error is: ', num2str( prctile(rms_3D_Save(:),95)), ' [m]\n']);
+fprintf(file_id, ['Max RMS Error is: ', num2str( max(rms_3D_Save(:))), ' [m]\n']);
+fprintf(file_id, '\n');
+fprintf(file_id, ['Median RMS URE is: ', num2str(median(rms_ure_Save(:))), ' [m]\n']);
+fprintf(file_id, ['95th Percentile RMS URE is: ', num2str( prctile(rms_ure_Save(:),95)), ' [m]\n']);
+fprintf(file_id, ['Max RMS URE is: ', num2str( max(rms_ure_Save(:))) ,' [m]\n']);
+fprintf(file_id, '\n');
+fprintf(file_id, ['Max In-Fit-Interval Error is: ', num2str( prctile(max_3D_Save(:),95)), ' [m]\n' ]);
+
+fclose(file_id);
+
+%% PLOT RAAN FOR COMPARISON 1 day
+
+% Load 7 day orbit propagation data set. 
+file_directory_GMAT = [pwd, '/Results_Fitting_MTSAT2/'];
+file_name_GMAT = 'EphemerisFile_mtsat2_1day.eph';
+
+% Set date limits for plotting. 
+x_lower_plot = datenum('Feb 03, 2018 23:30:00');
+x_upper_plot = datenum('Feb 04, 2018 23:30:00');
+
+% Read data in the propagated orbit file.
+exact_time_step = true;
+orbit_data = ...
+    read_GMAT_eph(file_directory_GMAT, file_name_GMAT, exact_time_step);
+
+% Plot RAAN as a function of date based on Keplerian model of GMAT data. 
+RAAN_propagated = length(orbit_data.pos_m);
+for idx = 1:length(orbit_data.pos_m)
+    [coe, ~, ~] = ...
+        ECI2COE(orbit_data.pos_m(idx, :), orbit_data.vel_m_s(idx, :));
+    
+    % Save RAAN. 
+    RAAN_propagated(idx) = coe.RAAN;
+end
+
+figure; 
+plot(orbit_data.datenum, RAAN_propagated, 'linewidth', 2)
+grid on
+ylabel('RAAN [deg]')
+datetick
+xlim([x_lower_plot, x_upper_plot])
+xlabel({'UTC',datestr(orbit_data.datenum(1), 'mmm-dd-yyyy')})
+title('RAAN as a function of propation time')
+fileSave = [file_dir_save ,'RAAN_vs_time_1day.png'];
+exportfig(gcf,fileSave,'height',9,'width',12,'fontsize',22,'resolution',220);
+
+%% PLOT RAAN FOR COMPARISON 7 day
 
 % Load 7 day orbit propagation data set. 
 file_directory_GMAT = [pwd, '/Results_Fitting_MTSAT2/'];
@@ -367,6 +515,5 @@ grid on
 ylabel('RAAN [deg]')
 xlabel(['Propagation Time Since ', orbit_data.datestr(1) ,' [days]'])
 title('RAAN as a function of propation time')
-fileSave = [file_dir_save ,'RAAN_vs_time.tiff'];
+fileSave = [file_dir_save ,'RAAN_vs_time_7day.png'];
 exportfig(gcf,fileSave,'height',9,'width',12,'fontsize',22,'resolution',220);
-

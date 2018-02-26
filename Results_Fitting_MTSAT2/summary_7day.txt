@@ -1,0 +1,11 @@
+Total failures is: 0
+
+Median RMS Error is: 0.018535 [m]
+95th Percentile RMS Error is: 0.042143 [m]
+Max RMS Error is: 0.078882 [m]
+
+Median RMS URE is: 0.0070662 [m]
+95th Percentile RMS URE is: 0.019566 [m]
+Max RMS URE is: 0.029004 [m]
+
+Max In-Fit-Interval Error is: 0.042818 [m]
